@@ -1,6 +1,5 @@
 /.idea
 /.php_cs.cache
-/.phpunit.result.cache
 
 *~
 
@@ -13,3 +12,8 @@
 /var/
 /vendor/
 ###< symfony/framework-bundle ###
+
+###> phpunit/phpunit ###
+/phpunit.xml
+.phpunit.result.cache
+###< phpunit/phpunit ###
