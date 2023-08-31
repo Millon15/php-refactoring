@@ -1,0 +1,19 @@
+{
+    "name": "millon/php-refactoring",
+    "description": "Code at home task by some company",
+    "type": "project",
+    "license": "MIT",
+    "autoload": {
+        "psr-4": {
+            "Millon\\PayseraPhpRefactoring\\": "src/"
+        }
+    },
+    "authors": [
+        {
+            "name": "Vitautas Brazas",
+            "email": "vbrazas15@gmail.com"
+        }
+    ],
+    "minimum-stability": "stable",
+    "require": {}
+}
