@@ -1,0 +1,5 @@
+<phpunit>
+  <php>
+    <server name="KERNEL_CLASS" value="Millon\PhpRefactoring\Kernel" />
+  </php>
+</phpunit>
