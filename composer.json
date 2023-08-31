@@ -20,7 +20,9 @@
         "symfony/console": "^6.3",
         "guzzlehttp/guzzle": "^7.8",
         "symfony/skeleton": "^6.3",
-        "symfony/flex": "^2.3"
+        "symfony/flex": "^2.3",
+        "symfony/runtime": "^6.3",
+        "symfony/yaml": "^6.3"
     },
     "require-dev": {
         "symfony/maker-bundle": "^1.50",
@@ -28,7 +30,8 @@
     },
     "config": {
         "allow-plugins": {
-            "symfony/flex": true
+            "symfony/flex": true,
+            "symfony/runtime": true
         }
     },
     "scripts": {

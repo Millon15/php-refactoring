@@ -1,10 +1,10 @@
 <phpunit>
   <php>
-    <server name="KERNEL_CLASS" value="Millon\PhpRefactoring\Kernel" />
+    <server name="KERNEL_CLASS" value="Millon\PhpRefactoring\Kernel"/>
 
-        <!-- ###+ symfony/framework-bundle ### -->
-        <env name="APP_ENV" value="dev"/>
-        <env name="APP_SECRET" value="272fdd7cda4cfef68d059355c55399e8"/>
-        <!-- ###- symfony/framework-bundle ### -->
+    <!-- ###+ symfony/framework-bundle ### -->
+    <env name="APP_ENV" value="dev"/>
+    <env name="APP_SECRET" value="272fdd7cda4cfef68d059355c55399e8"/>
+    <!-- ###- symfony/framework-bundle ### -->
   </php>
 </phpunit>
