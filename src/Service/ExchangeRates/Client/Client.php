@@ -6,8 +6,11 @@ namespace Millon\PhpRefactoring\Service\ExchangeRates\Client;
 
 use GuzzleHttp\Client as HttpClient;
 use GuzzleHttp\Exception\GuzzleException;
-use GuzzleHttp\RequestOptions;
+use Millon\PhpRefactoring\Entity\Collection\CurrencyCollection;
 use Millon\PhpRefactoring\Service\Contracts\ExchangeRatesInterface;
+use Symfony\Component\Serializer\Encoder\JsonEncoder;
+use Symfony\Component\Serializer\Normalizer\DateTimeNormalizer;
+use Symfony\Component\Serializer\SerializerInterface;
 
 final class Client implements ExchangeRatesInterface
 {
@@ -15,55 +18,27 @@ final class Client implements ExchangeRatesInterface
 
     public function __construct(
         private readonly string $baseUrl,
+        private readonly SerializerInterface $serializer,
         array $config = [],
     ) {
         $this->client = new HttpClient($config);
     }
 
     /**
-     * @return array<string, string|array<string, mixed>>
-     *
      * @throws GuzzleException
-     * @link https://smartsendereu.atlassian.net/wiki/spaces/docsru/pages/97288213/Messages+API
+     * @link https://exchangeratesapi.io/documentation/
      */
-    public function latest(): array
+    public function latest(): CurrencyCollection
     {
-        $url = $this->baseUrl . "/latest";
+        $url = "$this->baseUrl/latest";
 
         $response = $this->client->get($url);
 
-        // TODO check in middleware $response->getStatusCode();
-        // TODO add primitive validation in middleware of $response->getBody();
-
-        return json_decode($response->getBody()->getContents(), true);
-    }
-
-    /**
-     * @throws GuzzleException
-     * @link https://smartsendereu.atlassian.net/wiki/spaces/docsru/pages/97288213/Messages+API
-     */
-    public function sendContactMessage(string $contactId, string $message): void
-    {
-        $url = $this->baseUrl . "/contacts/$contactId/send";
-
-        $responseMessage = $this->client->post($url, [
-            RequestOptions::JSON => [
-                'type' => MessageType::TEXT->value,
-                'content' => $message,
-                // watermark = milliseconds since UNIX epoch
-                'watermark' => round(microtime(true) * 1000),
-            ],
-        ]);
-    }
-
-    /**
-     * @throws GuzzleException
-     * @link https://smartsendereu.atlassian.net/wiki/spaces/docsru/pages/97386531/Contact+Tags+API
-     */
-    public function addContactTag(string $contactId, Tag $tag): void
-    {
-        $url = $this->baseUrl . "/contacts/$contactId/tags/$tag->value";
-
-        $responseTag = $this->client->post($url);
+        return $this->serializer->deserialize(
+            $response->getBody()->getContents(),
+            CurrencyCollection::class,
+            JsonEncoder::FORMAT,
+            [DateTimeNormalizer::FORMAT_KEY => 'u']
+        );
     }
 }

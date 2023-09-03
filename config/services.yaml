@@ -7,6 +7,9 @@ services:
     _defaults:
         autowire: true
         autoconfigure: true
+    _instanceof:
+        Millon\PhpRefactoring\Service\Contracts\ComissionModifierInterface:
+            tags: [ { name: comission.modifier } ]
 
     Millon\PhpRefactoring\:
         resource: '../src/'
@@ -15,6 +18,9 @@ services:
             - '../src/Entity/'
             - '../src/Kernel.php'
 
+    Millon\PhpRefactoring\Service\ComissionCalculator:
+        arguments:
+            $comissionModifiers: !tagged comission.modifier
     Millon\PhpRefactoring\Service\Contracts\ComissionCalculatorInterface:
         alias: Millon\PhpRefactoring\Service\ComissionCalculator
 

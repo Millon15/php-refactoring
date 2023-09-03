@@ -4,8 +4,12 @@ declare(strict_types=1);
 
 namespace Millon\PhpRefactoring\Command;
 
+use LogicException;
 use Millon\PhpRefactoring\Entity\Person;
 use Millon\PhpRefactoring\Service\Contracts\ComissionCalculatorInterface;
+use Millon\PhpRefactoring\Service\Exception\CalculationException;
+use RuntimeException;
+use SplFileObject;
 use Symfony\Component\Console\Attribute\AsCommand;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputArgument;
@@ -14,6 +18,7 @@ use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Style\SymfonyStyle;
 use Symfony\Component\Serializer\Encoder\JsonEncoder;
 use Symfony\Component\Serializer\SerializerInterface;
+use Throwable;
 
 #[AsCommand(
     name: 'app:calculate-comissions',
@@ -39,33 +44,42 @@ final class CalculateComissionsCommand extends Command
         ;
     }
 
+    /**
+     * @throws LogicException|RuntimeException|CalculationException
+     */
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
         $io = new SymfonyStyle($input, $output);
         $filename = $input->getArgument('filename');
 
-        // Open file
-        try {
-            $file = new \SplFileObject($filename, 'r');
-        } catch (\LogicException $e) {
-            $io->error(sprintf('File "%s" is a directory', $filename));
-        } catch (\RuntimeException $e) {
-            $io->error(sprintf('File "%s" cannot be found', $filename));
-        } finally {
-            if (isset($e)) {
-                return Command::FAILURE;
-            }
-        }
-
-        // Process file and print results line by line
-        foreach ($this->proccess($file) as $proccesedLine) {
-            $io->writeln($proccesedLine, OutputInterface::OUTPUT_PLAIN);
-        }
+        $file = $this->open($filename, $io);
+        $this->proccess($file, $io);
 
         return Command::SUCCESS;
     }
 
-    private function proccess(\SplFileObject $file): iterable
+    /**
+     * @throws LogicException|RuntimeException
+     */
+    private function open(mixed $filename, SymfonyStyle $io): SplFileObject
+    {
+        try {
+            return new SplFileObject($filename, 'r');
+        } catch (LogicException $e) {
+            $io->error(sprintf('File "%s" is a directory', $filename));
+        } catch (RuntimeException $e) {
+            $io->error(sprintf('File "%s" cannot be found', $filename));
+        }
+
+        throw $e;
+    }
+
+    /**
+     * Process file and print results line by line
+     *
+     * @throws CalculationException
+     */
+    private function proccess(SplFileObject $file, SymfonyStyle $io): void
     {
         // Read file line by line
         foreach ($file as $line) {
@@ -74,9 +88,11 @@ final class CalculateComissionsCommand extends Command
                 continue;
             }
 
+            // TODO handle deserialize & calculate errors separately and gracefully
             $person = $this->serializer->deserialize($line, Person::class, JsonEncoder::FORMAT);
+            $comission = $this->commisionCalculator->calculate($person);
 
-            yield $this->commisionCalculator->calculate($person);
+            $io->writeln($comission, OutputInterface::OUTPUT_PLAIN);
         }
     }
 }

@@ -7,9 +7,9 @@ namespace Millon\PhpRefactoring\Entity;
 final class Person
 {
     public function __construct(
-        private readonly string $bin,
-        private readonly string $amount,
-        private readonly string $currency,
+        public readonly string $bin,
+        public readonly string $amount,
+        public readonly string $currency,
     ) {
     }
 }

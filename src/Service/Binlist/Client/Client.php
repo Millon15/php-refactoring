@@ -6,7 +6,10 @@ namespace Millon\PhpRefactoring\Service\Binlist\Client;
 
 use GuzzleHttp\Client as HttpClient;
 use GuzzleHttp\Exception\GuzzleException;
+use Millon\PhpRefactoring\Entity\Country;
 use Millon\PhpRefactoring\Service\Contracts\BinLookUpInterface;
+use Symfony\Component\Serializer\Encoder\JsonEncoder;
+use Symfony\Component\Serializer\SerializerInterface;
 
 final class Client implements BinLookUpInterface
 {
@@ -14,6 +17,7 @@ final class Client implements BinLookUpInterface
 
     public function __construct(
         private readonly string $baseUrl,
+        private readonly SerializerInterface $serializer,
         array $config = [],
     ) {
         $this->client = new HttpClient($config);
@@ -21,12 +25,18 @@ final class Client implements BinLookUpInterface
 
     /**
      * @throws GuzzleException
-     * @link https://smartsendereu.atlassian.net/wiki/spaces/docsru/pages/97386531/Contact+Tags+API
+     * @link https://binlist.net/
      */
-    public function lookup(string $bin): void
+    public function lookup(string $bin): Country
     {
-        $url = $this->baseUrl . "/$bin";
+        $url = "$this->baseUrl/$bin";
 
-        $responseTag = $this->client->post($url);
+        $response = $this->client->post($url);
+
+        return $this->serializer->deserialize(
+            $response->getBody()->getContents(),
+            Country::class,
+            JsonEncoder::FORMAT,
+        );
     }
 }
