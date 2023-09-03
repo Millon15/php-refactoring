@@ -1,18 +1,13 @@
-# This file is the entry point to configure your own services.
-# Files in the packages/ subdirectory configure your dependencies.
-
-# Put parameters here that don't need to change on each machine where the app is deployed
-# https://symfony.com/doc/current/best_practices.html#use-parameters-for-application-configuration
 parameters:
+    binlist.client.base_url:  '%env(BINLIST_BASE_URL)%'
+    exchangerates.client.base_url: '%env(EXCHANGERATES_BASE_URL)%'
+    exchangerates.client.middleware.auth.api_key: '%env(EXCHANGERATES_API_KEY)%'
 
 services:
-    # default configuration for services in *this* file
     _defaults:
-        autowire: true      # Automatically injects dependencies in your services.
-        autoconfigure: true # Automatically registers your services as commands, event subscribers, etc.
+        autowire: true
+        autoconfigure: true
 
-    # makes classes in src/ available to be used as services
-    # this creates a service per class whose id is the fully-qualified class name
     Millon\PhpRefactoring\:
         resource: '../src/'
         exclude:
@@ -20,5 +15,30 @@ services:
             - '../src/Entity/'
             - '../src/Kernel.php'
 
-    # add more service definitions when explicit configuration is needed
-    # please note that last definitions always *replace* previous ones
+    Millon\PhpRefactoring\Service\Contracts\ComissionCalculatorInterface:
+        alias: Millon\PhpRefactoring\Service\ComissionCalculator
+
+    # binlist client configuration
+    Millon\PhpRefactoring\Service\Binlist\Client\Client:
+        arguments:
+            $baseUrl: '%binlist.client.base_url%'
+    Millon\PhpRefactoring\Service\Contracts\BinLookUpInterface:
+        alias: Millon\PhpRefactoring\Service\Binlist\Client\Client
+
+    # exchangerates client configuration
+    exchangerates.client.middleware.auth:
+        class: Millon\PhpRefactoring\Service\ExchangeRates\Client\Middleware\Auth
+        arguments:
+            $apiKey: '%exchangerates.client.middleware.auth.api_key%'
+    exchangerates.client.handler_stack:
+        class: GuzzleHttp\HandlerStack
+        factory: [ 'GuzzleHttp\HandlerStack', 'create' ]
+        calls:
+            - [ 'push', [ '@exchangerates.client.middleware.auth', 'auth' ] ]
+    Millon\PhpRefactoring\Service\ExchangeRates\Client\Client:
+        arguments:
+            $baseUrl: '%exchangerates.client.base_url%'
+            $config:
+                handler: '@exchangerates.client.handler_stack'
+    Millon\PhpRefactoring\Service\Contracts\ExchangeRatesInterface:
+        alias: Millon\PhpRefactoring\Service\ExchangeRates\Client\Client
