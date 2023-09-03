@@ -5,6 +5,7 @@
 
 # manual test data files
 /data/
+/app*
 
 ###> symfony/framework-bundle ###
 /.env.local
