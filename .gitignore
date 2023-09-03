@@ -3,7 +3,7 @@
 # tmp emacs files
 *~
 
-# manual test data files
+# manual test files
 /data/
 /app*
 

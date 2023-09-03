@@ -1,6 +1,6 @@
 {
     "name": "millon/php-refactoring",
-    "description": "Code at home task by some company",
+    "description": "Just another refactoring. Done from and on php.",
     "type": "project",
     "license": "MIT",
     "autoload": {
