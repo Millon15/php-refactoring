@@ -10,6 +10,5 @@ final class Person
         public readonly string $bin,
         public readonly string $amount,
         public readonly string $currency,
-    ) {
-    }
+    ) {}
 }

@@ -8,7 +8,7 @@ services:
         autowire: true
         autoconfigure: true
     _instanceof:
-        Millon\PhpRefactoring\Service\Contracts\ComissionModifierInterface:
+        Millon\PhpRefactoring\Service\Comission\Contracts\ComissionModifierInterface:
             tags: [ { name: comission.modifier } ]
 
     Millon\PhpRefactoring\:
@@ -18,20 +18,28 @@ services:
             - '../src/Entity/'
             - '../src/Kernel.php'
 
-    Millon\PhpRefactoring\Service\ComissionCalculator:
+    # comission calculator
+    Millon\PhpRefactoring\Service\Comission\Contracts\ComissionContextInterface:
+        alias: Millon\PhpRefactoring\Service\Comission\ComissionContext
+    Millon\PhpRefactoring\Service\Comission\ComissionCalculator:
         arguments:
-            $comissionModifiers: !tagged comission.modifier
+            # $comissionModifiers: !tagged comission.modifier
+            # have to pass modifiers by strict order to calculate comission correctly
+            $comissionModifiers:
+                - '@Millon\PhpRefactoring\Service\Comission\ComissionModifier\Initial'
+                - '@Millon\PhpRefactoring\Service\Comission\ComissionModifier\ByCountry'
+                - '@Millon\PhpRefactoring\Service\Comission\ComissionModifier\Round'
     Millon\PhpRefactoring\Service\Contracts\ComissionCalculatorInterface:
-        alias: Millon\PhpRefactoring\Service\ComissionCalculator
+        alias: Millon\PhpRefactoring\Service\Comission\ComissionCalculator
 
-    # binlist client configuration
+    # binlist client
     Millon\PhpRefactoring\Service\Binlist\Client\Client:
         arguments:
             $baseUrl: '%binlist.client.base_url%'
     Millon\PhpRefactoring\Service\Contracts\BinLookUpInterface:
         alias: Millon\PhpRefactoring\Service\Binlist\Client\Client
 
-    # exchangerates client configuration
+    # exchangerates client
     exchangerates.client.middleware.auth:
         class: Millon\PhpRefactoring\Service\ExchangeRates\Client\Middleware\Auth
         arguments:

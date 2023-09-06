@@ -2,7 +2,7 @@
 
 declare(strict_types = 1);
 
-namespace Millon\PhpRefactoring\Service\Exception;
+namespace Millon\PhpRefactoring\Service\Comission\Exception;
 
 final class CalculationException extends \RuntimeException
 {

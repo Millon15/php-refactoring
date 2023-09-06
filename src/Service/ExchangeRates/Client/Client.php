@@ -6,7 +6,7 @@ namespace Millon\PhpRefactoring\Service\ExchangeRates\Client;
 
 use GuzzleHttp\Client as HttpClient;
 use GuzzleHttp\Exception\GuzzleException;
-use Millon\PhpRefactoring\Entity\Collection\CurrencyCollection;
+use Millon\PhpRefactoring\Entity\Collection\Rates;
 use Millon\PhpRefactoring\Service\Contracts\ExchangeRatesInterface;
 use Symfony\Component\Serializer\Encoder\JsonEncoder;
 use Symfony\Component\Serializer\Normalizer\DateTimeNormalizer;
@@ -28,7 +28,7 @@ final class Client implements ExchangeRatesInterface
      * @throws GuzzleException
      * @link https://exchangeratesapi.io/documentation/
      */
-    public function latest(): CurrencyCollection
+    public function latest(): Rates
     {
         $url = "$this->baseUrl/latest";
 
@@ -36,9 +36,8 @@ final class Client implements ExchangeRatesInterface
 
         return $this->serializer->deserialize(
             $response->getBody()->getContents(),
-            CurrencyCollection::class,
-            JsonEncoder::FORMAT,
-            [DateTimeNormalizer::FORMAT_KEY => 'u']
+            Rates::class,
+            JsonEncoder::FORMAT
         );
     }
 }

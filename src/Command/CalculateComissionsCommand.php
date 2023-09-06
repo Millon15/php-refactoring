@@ -6,8 +6,8 @@ namespace Millon\PhpRefactoring\Command;
 
 use LogicException;
 use Millon\PhpRefactoring\Entity\Person;
+use Millon\PhpRefactoring\Service\Comission\Exception\CalculationException;
 use Millon\PhpRefactoring\Service\Contracts\ComissionCalculatorInterface;
-use Millon\PhpRefactoring\Service\Exception\CalculationException;
 use RuntimeException;
 use SplFileObject;
 use Symfony\Component\Console\Attribute\AsCommand;
@@ -18,7 +18,6 @@ use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Style\SymfonyStyle;
 use Symfony\Component\Serializer\Encoder\JsonEncoder;
 use Symfony\Component\Serializer\SerializerInterface;
-use Throwable;
 
 #[AsCommand(
     name: 'app:calculate-comissions',
@@ -88,11 +87,10 @@ final class CalculateComissionsCommand extends Command
                 continue;
             }
 
-            // TODO handle deserialize & calculate errors separately and gracefully
             $person = $this->serializer->deserialize($line, Person::class, JsonEncoder::FORMAT);
             $comission = $this->commisionCalculator->calculate($person);
 
-            $io->writeln($comission, OutputInterface::OUTPUT_PLAIN);
+            $io->writeln($comission->totalAmount, OutputInterface::OUTPUT_PLAIN);
         }
     }
 }

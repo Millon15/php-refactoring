@@ -2,13 +2,14 @@
 
 declare(strict_types=1);
 
-namespace Millon\PhpRefactoring\Service;
+namespace Millon\PhpRefactoring\Service\Comission\ComissionModifier;
 
-use Millon\PhpRefactoring\Entity\Collection\CurrencyCollection;
+use Millon\PhpRefactoring\Entity\Comission;
 use Millon\PhpRefactoring\Entity\Country;
-use Millon\PhpRefactoring\Service\Contracts\ComissionModifierInterface;
+use Millon\PhpRefactoring\Service\Comission\Contracts\ComissionContextInterface;
+use Millon\PhpRefactoring\Service\Comission\Contracts\ComissionModifierInterface;
 
-final class CountryComissionModifier implements ComissionModifierInterface
+final class ByCountry implements ComissionModifierInterface
 {
     private const EU_ALPHA2 = [
         'AT',
@@ -42,21 +43,20 @@ final class CountryComissionModifier implements ComissionModifierInterface
     private const EU_COMISSION_MULTIPLIER = '0.01';
     private const NON_EU_COMISSION_MULTIPLIER = '0.02';
 
-    private function isEu(Country $country): bool
+    public function modify(Comission $comission, ComissionContextInterface $context): Comission
     {
-        return in_array($country->alpha2, self::EU_ALPHA2, true);
-    }
+        $country = $context->lookup($comission->person->bin);
 
-    /** TODO bcmath this implementation */
-    public function modify(
-        string $comission,
-        Country $country,
-        CurrencyCollection $currencyCollection
-    ): string {
         $comissionMultiplier = $this->isEu($country)
             ? self::EU_COMISSION_MULTIPLIER
             : self::NON_EU_COMISSION_MULTIPLIER;
+        $sum = $comission->totalAmount * $comissionMultiplier;
 
-        return (string) ($comission * $comissionMultiplier);
+        return $comission->withNewAmount((string) $sum);
+    }
+
+    private function isEu(Country $country): bool
+    {
+        return in_array($country->alpha2, self::EU_ALPHA2, true);
     }
 }

@@ -13,6 +13,5 @@ final class Country
         public readonly string $alpha2,
         #[SerializedPath('[country][currency]')]
         public readonly string $currency,
-    ) {
-    }
+    ) {}
 }
