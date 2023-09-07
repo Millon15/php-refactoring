@@ -4,17 +4,15 @@ declare(strict_types=1);
 
 namespace Millon\PhpRefactoring\Test\Unit\Service\Comission\ComissionModifier;
 
-use Millon\PhpRefactoring\Entity\Collection\Rates;
 use Millon\PhpRefactoring\Entity\Comission;
-use Millon\PhpRefactoring\Entity\Country;
 use Millon\PhpRefactoring\Entity\Person;
-use Millon\PhpRefactoring\Service\Comission\ComissionModifier\ByCountry as UnitUnderTest;
+use Millon\PhpRefactoring\Service\Comission\ComissionModifier\Round as UnitUnderTest;
 use Millon\PhpRefactoring\Service\Comission\Contracts\ComissionContextInterface;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 
-final class ByCountryTest extends TestCase
+final class RoundTest extends TestCase
 {
     protected ComissionContextInterface|MockObject $comissionContextMock;
 
@@ -23,44 +21,33 @@ final class ByCountryTest extends TestCase
         $this->comissionContextMock = $this->createMock(ComissionContextInterface::class);
     }
 
-    private function setupComissionContextMock(string $bin, Country $country): void
+    private function setupComissionContextMock(): void
     {
         $this->comissionContextMock->expects($this->never())
-            ->method('latest');
+            ->method('lookup');
 
-        $this->comissionContextMock->expects($this->once())
-            ->method('lookup')
-            ->with($bin)
-            ->willReturn($country);
+        $this->comissionContextMock->expects($this->never())
+            ->method('latest');
     }
 
     /** @return iterable<array<string, string> */
     public static function success(): iterable
     {
-        // EU
-        $bin = '123456';
-        $person = new Person($bin, '100', 'EUR');
-        $comission = new Comission($person);
-        $country = new Country('AT', $person->currency);
+        $person = new Person('123456', '1.1324234652387', 'EUR');
+        $comission = new Comission($person, $person->amount, $person->currency);
 
         yield [
-            '$comission' => $comission->withNewSum('100'),
-            '$expectedComission' => $comission->withNewSum('1'),
-            '$bin' => $bin,
-            '$country' => $country,
+            '$comission' => $comission,
+            '$expectedComission' => $comission->withNewSum('1.14'),
         ];
 
-        // non-EU
-        $bin = '23456';
-        $person = new Person($bin, '100', 'EUR');
-        $comission = new Comission($person);
-        $country = new Country('UA', $person->currency);
+
+        $person = new Person('123456', '1321.33983', 'EUR');
+        $comission = new Comission($person, $person->amount, $person->currency);
 
         yield [
-            '$comission' => $comission->withNewSum('100'),
-            '$expectedComission' => $comission->withNewSum('2'),
-            '$bin' => $bin,
-            '$country' => $country,
+            '$comission' => $comission,
+            '$expectedComission' => $comission->withNewSum('1321.34'),
         ];
     }
 
@@ -68,10 +55,8 @@ final class ByCountryTest extends TestCase
     public function testModify(
         Comission $comission,
         Comission $expectedComission,
-        string $bin,
-        Country $country,
     ): void {
-        $this->setupComissionContextMock($bin, $country);
+        $this->setupComissionContextMock();
 
         $resultComission = (new UnitUnderTest())->modify($comission, $this->comissionContextMock);
 
