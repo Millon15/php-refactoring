@@ -1,5 +1,37 @@
 # php refactoring challenge
 
+## Usage of my solution
+
+- Code I wrote are pretty readable, single-responsible, easy testable - see [tests](tests).
+- It will be easy to maintain and extend -
+  see [Contracts](src/Service/Contracts) and [Comission/Contracts](src/Service/Comission/Contracts).
+- I leaved comments in somewhat non-obvious places.
+
+You can run my solution by next command:
+
+```bash
+./app data/input.txt
+```
+
+## Testing of my solution
+
+- I wrote **22** test cases.
+- I used [Unit](tests/Unit) tests to cover classes with business logic.
+- I used symfony-flavored [Integration](tests/Integration) tests to cover external API Client units such as:
+    - [Binlist/Client](src/Service/ExchangeRates/Client/Client.php)
+    - [ExchangeRates/Client](src/Service/ExchangeRates/Client/Client.php)
+- I would wrote symfony Application test to cover [CalculateComissionsCommand](src/Command/CalculateComissionsCommand.php)
+  but I have already run out of time.
+
+I used **PHPUnit** to implement both *Unit* and *Integration* tests.
+To tests the app fire next command:
+
+```bash
+vendor/bin/phpunit --bootstrap tests/bootstrap.php tests
+```
+
+### Terms and Conditions of the challenge
+
 - There is some really ugly, but kinda working code
 - The challenge is to refactor (rewrite, actually) this code and to cover it with unit tests
 
