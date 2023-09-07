@@ -13,15 +13,12 @@ use Symfony\Component\Serializer\SerializerInterface;
 
 final class Client implements BinLookUpInterface
 {
-    private readonly HttpClient $client;
 
     public function __construct(
         private readonly string $baseUrl,
+        private readonly HttpClient $client,
         private readonly SerializerInterface $serializer,
-        array $config = [],
-    ) {
-        $this->client = new HttpClient($config);
-    }
+    ) {}
 
     /**
      * @throws GuzzleException
@@ -31,7 +28,7 @@ final class Client implements BinLookUpInterface
     {
         $url = "$this->baseUrl/$bin";
 
-        $response = $this->client->post($url);
+        $response = $this->client->get($url);
 
         return $this->serializer->deserialize(
             $response->getBody()->getContents(),

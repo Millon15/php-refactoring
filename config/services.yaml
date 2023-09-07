@@ -33,9 +33,12 @@ services:
         alias: Millon\PhpRefactoring\Service\Comission\ComissionCalculator
 
     # binlist client
+    binlist.client:
+        class: GuzzleHttp\Client
     Millon\PhpRefactoring\Service\Binlist\Client\Client:
         arguments:
             $baseUrl: '%binlist.client.base_url%'
+            $client: '@binlist.client'
     Millon\PhpRefactoring\Service\Contracts\BinLookUpInterface:
         alias: Millon\PhpRefactoring\Service\Binlist\Client\Client
 
@@ -49,10 +52,14 @@ services:
         factory: [ 'GuzzleHttp\HandlerStack', 'create' ]
         calls:
             - [ 'push', [ '@exchangerates.client.middleware.auth', 'auth' ] ]
+    exchangerates.client:
+        class: GuzzleHttp\Client
+        arguments:
+            $config:
+                handler: '@exchangerates.client.handler_stack'
     Millon\PhpRefactoring\Service\ExchangeRates\Client\Client:
         arguments:
             $baseUrl: '%exchangerates.client.base_url%'
-            $config:
-                handler: '@exchangerates.client.handler_stack'
+            $client: '@exchangerates.client'
     Millon\PhpRefactoring\Service\Contracts\ExchangeRatesInterface:
         alias: Millon\PhpRefactoring\Service\ExchangeRates\Client\Client

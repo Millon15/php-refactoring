@@ -16,7 +16,11 @@ framework:
     #esi: true
     #fragments: true
     php_errors:
+        throw: true
         log: true
+    exceptions:
+        Exception:
+            log_level: 'error'
 
 when@test:
     framework:

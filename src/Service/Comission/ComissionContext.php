@@ -15,7 +15,7 @@ use Millon\PhpRefactoring\Service\Contracts\ExchangeRatesInterface;
 /** TODO implement REAL caching */
 final class ComissionContext implements ComissionContextInterface
 {
-    /** @var Country[] */
+    /** @var array<string, Country> map bin => Country */
     private array $countries = [];
     private readonly Rates $rates;
 
