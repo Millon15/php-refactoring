@@ -5,7 +5,8 @@
     "license": "MIT",
     "autoload": {
         "psr-4": {
-            "Millon\\PhpRefactoring\\": "src/"
+            "Millon\\PhpRefactoring\\": "src/",
+            "Millon\\PhpRefactoring\\Test\\": "tests/"
         }
     },
     "authors": [

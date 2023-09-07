@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace Integration\Service\Binlist\Client;
+namespace Millon\PhpRefactoring\Test\Integration\Service\Binlist\Client;
 
 use GuzzleHttp\Client as HttpClient;
 use GuzzleHttp\Psr7\Response;
@@ -10,6 +10,7 @@ use Millon\PhpRefactoring\Service\Binlist\Client\Client as UnitUnderTest;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\MockObject\MockObject;
 use Symfony\Bundle\FrameworkBundle\Test\KernelTestCase;
+use Symfony\Component\Serializer\Exception\NotEncodableValueException;
 use Symfony\Component\Serializer\SerializerInterface;
 
 final class ClientTest extends KernelTestCase
@@ -24,7 +25,7 @@ final class ClientTest extends KernelTestCase
     }
 
     /** @return array<array<string, string> */
-    public static function successJson(): array
+    public static function success(): array
     {
         return [
             [
@@ -37,19 +38,44 @@ final class ClientTest extends KernelTestCase
         ];
     }
 
-    #[DataProvider('successJson')]
+    #[DataProvider('success')]
     public function testSuccess(string $baseUrl, string $bin, string $alpha2, string $currency, string $body): void
     {
         $serializer = self::getContainer()->get(SerializerInterface::class);
         $this->mockClient->expects($this->once())
             ->method('get')
             ->with("$baseUrl/$bin")
-            ->willReturn(new Response(200, [], $body));
+            ->willReturn(new Response(200, body: $body));
 
         $client = new UnitUnderTest($baseUrl, $this->mockClient, $serializer);
         $country = $client->lookup($bin);
 
         $this->assertEquals($alpha2, $country->alpha2);
         $this->assertEquals($currency, $country->currency);
+    }
+
+    /** @return array<array<string, string> */
+    public static function failure(): array
+    {
+        return [
+            [
+                '$baseUrl' => 'https://api.example.com',
+                '$bin' => '123456',
+            ],
+        ];
+    }
+
+    #[DataProvider('failure')]
+    public function testFailure(string $baseUrl, string $bin): void
+    {
+        $serializer = self::getContainer()->get(SerializerInterface::class);
+        $this->mockClient->expects($this->once())
+            ->method('get')
+            ->with("$baseUrl/$bin")
+            ->willReturn(new Response(404));
+
+        $client = new UnitUnderTest($baseUrl, $this->mockClient, $serializer);
+        $this->expectException(NotEncodableValueException::class);
+        $client->lookup($bin);
     }
 }

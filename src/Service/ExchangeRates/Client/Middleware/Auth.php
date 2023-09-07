@@ -6,7 +6,6 @@ namespace Millon\PhpRefactoring\Service\ExchangeRates\Client\Middleware;
 
 use Psr\Http\Message\RequestInterface;
 
-/** @internal */
 final class Auth
 {
     public function __construct(
