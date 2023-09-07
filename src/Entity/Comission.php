@@ -10,23 +10,16 @@ final class Comission
 
     public function __construct(
         public readonly Person $person,
-        public readonly null|string $totalAmount = null,
+        public readonly null|string $sum = null,
         public readonly string $currency = self::DEFAULT_CURRENCY,
     ) {}
 
     public function isInitialized(): bool
     {
-        return null !== $this->totalAmount;
+        return null !== $this->sum;
     }
 
-    public function comissionSum(): string
-    {
-        $sum = $this->person->amount - $this->totalAmount;
-
-        return (string) $sum;
-    }
-
-    public function withNewAmount(string $amount): self
+    public function withNewSum(string $amount): self
     {
         return new self(
             $this->person,

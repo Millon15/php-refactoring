@@ -90,7 +90,7 @@ final class CalculateComissionsCommand extends Command
             $person = $this->serializer->deserialize($line, Person::class, JsonEncoder::FORMAT);
             $comission = $this->commisionCalculator->calculate($person);
 
-            $io->writeln($comission->totalAmount, OutputInterface::OUTPUT_PLAIN);
+            $io->writeln($comission->sum, OutputInterface::OUTPUT_PLAIN);
         }
     }
 }

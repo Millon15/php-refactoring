@@ -16,7 +16,6 @@ use Symfony\Component\Serializer\SerializerInterface;
 final class ClientTest extends KernelTestCase
 {
     protected HttpClient|MockObject $mockClient;
-    protected SerializerInterface|MockObject $serializerMock;
 
     protected function setUp(): void
     {

@@ -50,9 +50,9 @@ final class ByCountry implements ComissionModifierInterface
         $comissionMultiplier = $this->isEu($country)
             ? self::EU_COMISSION_MULTIPLIER
             : self::NON_EU_COMISSION_MULTIPLIER;
-        $sum = $comission->totalAmount * $comissionMultiplier;
+        $sum = $comission->sum * $comissionMultiplier;
 
-        return $comission->withNewAmount((string) $sum);
+        return $comission->withNewSum((string) $sum);
     }
 
     private function isEu(Country $country): bool

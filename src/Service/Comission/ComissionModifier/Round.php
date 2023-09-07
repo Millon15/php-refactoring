@@ -15,8 +15,8 @@ final class Round implements ComissionModifierInterface
 {
     public function modify(Comission $comission, ComissionContextInterface $context): Comission
     {
-        $sum = ceil($comission->totalAmount * 100) / 100;
+        $sum = ceil($comission->sum * 100) / 100;
 
-        return $comission->withNewAmount((string) $sum);
+        return $comission->withNewSum((string) $sum);
     }
 }

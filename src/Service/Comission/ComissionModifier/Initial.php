@@ -16,13 +16,13 @@ final class Initial implements ComissionModifierInterface
         $person = $comission->person;
 
         if ($person->currency === Comission::DEFAULT_CURRENCY) {
-            return $comission->withNewAmount($person->amount);
+            return $comission->withNewSum($person->amount);
         }
 
         $rate = $context->latest()->rates[$person->currency]
             ?? throw new CalculationException(sprintf('Rate for "%s" has not been found', $person->currency));
         $sum = $person->amount / $rate;
 
-        return $comission->withNewAmount((string) $sum);
+        return $comission->withNewSum((string) $sum);
     }
 }

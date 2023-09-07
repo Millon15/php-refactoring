@@ -42,7 +42,7 @@ final class AuthTest extends TestCase
         [$request, $options] = $authMiddleware([$this, 'handler'])($initialRequest, [])();
 
         $this->assertEmpty($options);
-        $this->assertNotEquals($initialRequest, $request);
+        $this->assertNotSame($initialRequest, $request);
         $this->assertEquals($initialRequest->getMethod(), $request->getMethod());
         $this->assertEquals($initialRequest->getUri()->getHost(), $request->getUri()->getHost());
         $this->assertStringEndsWith($apiKey, $request->getUri()->getQuery());
