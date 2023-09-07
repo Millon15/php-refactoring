@@ -13,7 +13,6 @@ use Symfony\Component\Serializer\SerializerInterface;
 
 final class Client implements BinLookUpInterface
 {
-
     public function __construct(
         private readonly string $baseUrl,
         private readonly HttpClient $client,
